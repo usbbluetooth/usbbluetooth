@@ -14,6 +14,8 @@ static char _log_tag(usbbluetooth_log_level_t l)
         return ' ';
     case USBBLUETOOTH_LOG_ERROR:
         return 'E';
+    case USBBLUETOOTH_LOG_WARN:
+        return 'W';
     case USBBLUETOOTH_LOG_INFO:
         return 'I';
     case USBBLUETOOTH_LOG_DEBUG:
