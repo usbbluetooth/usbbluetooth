@@ -47,16 +47,12 @@ jobs:
     - name: Build the library
       run: meson compile -v -C builddir
 
-    - name: Package
-      run: meson compile package -v -C builddir
-
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: usbbluetooth_${{ matrix.sys.os }}
         path: |
           builddir/src/libusbbluetooth/libusbbluetooth.${{ matrix.sys.ext }}
-          builddir/winx64_usbbluetooth_*.zip
 
   build_bindings_csharp:
     needs: build_library
@@ -105,10 +101,6 @@ jobs:
 
     - name: Release
       uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          usbbluetooth_*/winx64_usbbluetooth_*.zip
-
 
   publish_nuget:
     runs-on: ubuntu-latest
