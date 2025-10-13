@@ -37,8 +37,3 @@ Your Linux user must have permissions to access USB hardware. Here are several o
 This library has been programmed in C. You can find information on how to compile, install and use it in the [C API document](API_C.md).
 
 You can also find documentation for the [C# API](API_CSharp.md).
-
-
-## Architecture
-
-You may find more information about the design and architecture of this software in the [Architecture](Architecture.md) document.

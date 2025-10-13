@@ -5,6 +5,8 @@
 
 LibUSB based Bluetooth device driver. Take full control of your USB Bluetooth devices using C!
 
+For general documentation about the project, please visit [usbbluetooth.github.io](https://usbbluetooth.github.io).
+
 For a python version of this library, checkout [UsbBluetooth for Python](https://github.com/usbbluetooth/usbbluetooth-python).
 
 ## Usage
