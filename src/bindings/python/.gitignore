@@ -1,8 +1,0 @@
-# Python
-*.egg-info
-__pycache__
-
-# Project files
-usbbluetooth/lib/*.dll
-usbbluetooth/lib/*.so
-usbbluetooth/lib/*.dylib

@@ -1,2 +1,1 @@
 subdir('csharp')
-subdir('python')

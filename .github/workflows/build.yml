@@ -58,41 +58,6 @@ jobs:
           builddir/src/libusbbluetooth/libusbbluetooth.${{ matrix.sys.ext }}
           builddir/winx64_usbbluetooth_*.zip
 
-
-  build_bindings_python:
-    needs: build_library
-    name: Build Python bindings
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v5
-      with:
-        fetch-depth: 0
-
-    - name: Download artifacts
-      uses: actions/download-artifact@v5
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install meson libusb-1.0-0 libusb-1.0-0-dev python3-build
-
-    - name: Copy library
-      run: cp usbbluetooth_*/src/libusbbluetooth/*.{so,dll,dylib} src/bindings/python/usbbluetooth/lib/
-
-    - name: Configure
-      run: meson setup builddir
-
-    - name: Build package
-      run: meson compile usbbluetooth_python -v -C builddir
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: usbbluetooth_python
-        path: builddir/src/bindings/python/*
-
-
   build_bindings_csharp:
     needs: build_library
     name: Build C# bindings
@@ -130,7 +95,7 @@ jobs:
   publish_release:
     runs-on: ubuntu-latest
     name: Publish to Github releases
-    needs: [build_library, build_bindings_python, build_bindings_csharp]
+    needs: [build_library, build_bindings_csharp]
     if: contains(github.ref, 'refs/tags/v')
     permissions:
       contents: write
@@ -148,7 +113,7 @@ jobs:
   publish_nuget:
     runs-on: ubuntu-latest
     name: Publish NuGet package
-    needs: [build_library, build_bindings_python, build_bindings_csharp]
+    needs: [build_library, build_bindings_csharp]
     if: contains(github.ref, 'refs/tags/v')
     permissions:
       packages: write
@@ -163,24 +128,3 @@ jobs:
 
     - name: Upload to repository
       run: dotnet nuget push usbbluetooth_*/usbbluetooth*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-
-
-  publish_pypi:
-    name: Publish to PyPi
-    needs: [build_library, build_bindings_python, build_bindings_csharp]
-    if: contains(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/usbbluetooth
-    permissions:
-      id-token: write
-    steps:
-    - name: Download artifacts
-      uses: actions/download-artifact@v5
-      with:
-        name: usbbluetooth_python
-        path: dist/
-
-    - name: Publish distribution to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
