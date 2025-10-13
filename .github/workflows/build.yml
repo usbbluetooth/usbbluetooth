@@ -54,44 +54,10 @@ jobs:
         path: |
           builddir/src/libusbbluetooth/libusbbluetooth.${{ matrix.sys.ext }}
 
-  build_bindings_csharp:
-    needs: build_library
-    name: Build C# bindings
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v5
-      with:
-        fetch-depth: 0
-
-    - name: Download artifacts
-      uses: actions/download-artifact@v5
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install meson dotnet-sdk-8.0
-
-    - name: Copy library
-      run: cp usbbluetooth_*/src/libusbbluetooth/*.{so,dll,dylib} src/bindings/csharp/UsbBluetooth/
-
-    - name: Configure
-      run: meson setup builddir
-
-    - name: Build package
-      run: meson compile usbbluetooth_csharp -v -C builddir
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: usbbluetooth_csharp
-        path: builddir/src/bindings/csharp/*.nupkg
-
-
   publish_release:
     runs-on: ubuntu-latest
     name: Publish to Github releases
-    needs: [build_library, build_bindings_csharp]
+    needs: [build_library]
     if: contains(github.ref, 'refs/tags/v')
     permissions:
       contents: write
@@ -101,22 +67,3 @@ jobs:
 
     - name: Release
       uses: softprops/action-gh-release@v2
-
-  publish_nuget:
-    runs-on: ubuntu-latest
-    name: Publish NuGet package
-    needs: [build_library, build_bindings_csharp]
-    if: contains(github.ref, 'refs/tags/v')
-    permissions:
-      packages: write
-    steps:
-    - name: Download artifacts
-      uses: actions/download-artifact@v5
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: '8.0.x'
-
-    - name: Upload to repository
-      run: dotnet nuget push usbbluetooth_*/usbbluetooth*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json

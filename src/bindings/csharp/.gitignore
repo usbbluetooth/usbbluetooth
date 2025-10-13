@@ -1,9 +1,0 @@
-# CSharp
-.vs/
-bin/
-obj/
-
-# Project files
-UsbBluetooth/*.dll
-UsbBluetooth/*.so
-UsbBluetooth/*.dylib
