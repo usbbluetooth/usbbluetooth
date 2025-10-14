@@ -7,7 +7,7 @@ LibUSB based Bluetooth device driver. Take full control of your USB Bluetooth de
 
 For general documentation about the project, please visit [usbbluetooth.github.io](https://usbbluetooth.github.io).
 
-For a Python version of this library, check out [UsbBluetooth for Python](https://github.com/usbbluetooth/usbbluetooth-python).
+For a Python version of this library, check out [UsbBluetooth for Python](https://github.com/usbbluetooth/usbbluetooth-python) or [Scapy UsbBluetooth](https://github.com/usbbluetooth/scapy-usbbluetooth) for direct integration with Scapy.
 
 For a C# version of this library, check out [UsbBluetooth for C#](https://github.com/usbbluetooth/usbbluetooth-csharp).
 
