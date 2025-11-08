@@ -1,17 +1,25 @@
 #include <usbbluetooth_io.h>
 
-#include <utils.h>
 #include <usbbluetooth_log.h>
+
+#include <utils.h>
 #include <hci.h>
 
 #define TIMEOUT 1000
+
+#include <stdio.h>
 
 usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_open(usbbluetooth_device_t *dev)
 {
     // Open the device and get a handle...
     int err = libusb_open(dev->device.usb, &dev->context.usb->handle);
-    if (err < LIBUSB_SUCCESS)
+    if (err < LIBUSB_SUCCESS) {
+#if defined(_WIN32) || defined(__CYGWIN__)
+        if (err == LIBUSB_ERROR_NOT_SUPPORTED)
+            return USBBLUETOOTH_STATUS_WRONG_DRIVER;
+#endif
         return USBBLUETOOTH_STATUS_ERR_UNK;
+    }
 
     err = _dev_find_bluetooth_interface(dev->device.usb, &dev->context.usb->interface_num);
     if (err < LIBUSB_SUCCESS)
