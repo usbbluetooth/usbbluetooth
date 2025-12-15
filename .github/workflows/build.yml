@@ -48,7 +48,7 @@ jobs:
       run: meson compile -v -C builddir
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: usbbluetooth_${{ matrix.sys.os }}
         path: |
