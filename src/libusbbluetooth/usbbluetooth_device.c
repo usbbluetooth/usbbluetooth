@@ -1,7 +1,7 @@
 #include <usbbluetooth_device.h>
 
-#include <usbbluetooth_log.h>
-#include <utils.h>
+#include "usbbluetooth_log.h"
+#include "utils.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

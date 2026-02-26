@@ -1,8 +1,8 @@
 #ifndef _H_USBBLUETOOTH_IO_
 #define _H_USBBLUETOOTH_IO_
 
-#include <usbbluetooth_api.h>
-#include <usbbluetooth_device.h>
+#include "usbbluetooth_api.h"
+#include "usbbluetooth_device.h"
 #include <stdint.h>
 
 /**

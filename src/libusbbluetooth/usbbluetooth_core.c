@@ -1,7 +1,7 @@
 #include <usbbluetooth_err.h>
 
 #include <libusb.h>
-#include <usbbluetooth_log.h>
+#include "usbbluetooth_log.h"
 
 usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_init()
 {

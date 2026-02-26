@@ -1,7 +1,7 @@
 #ifndef _H_USBBLUETOOTH_ERR_
 #define _H_USBBLUETOOTH_ERR_
 
-#include <usbbluetooth_api.h>
+#include "usbbluetooth_api.h"
 
 /**
  * Error code list.

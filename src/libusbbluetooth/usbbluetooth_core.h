@@ -1,8 +1,8 @@
 #ifndef _H_USBBLUETOOTH_CORE_
 #define _H_USBBLUETOOTH_CORE_
 
-#include <usbbluetooth_api.h>
-#include <usbbluetooth_err.h>
+#include "usbbluetooth_api.h"
+#include "usbbluetooth_err.h"
 
 /**
  * Initialize USB Bluetooth library.

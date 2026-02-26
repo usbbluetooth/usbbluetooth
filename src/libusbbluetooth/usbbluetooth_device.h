@@ -1,10 +1,10 @@
 #ifndef _H_USBBLUETOOTH_DEVICE_
 #define _H_USBBLUETOOTH_DEVICE_
 
-#include <usbbluetooth_api.h>
-#include <usbbluetooth_err.h>
-#include <stdint.h>
+#include "usbbluetooth_api.h"
+#include "usbbluetooth_err.h"
 #include <libusb.h>
+#include <stdint.h>
 
 /**
  * Device type enumeration.
