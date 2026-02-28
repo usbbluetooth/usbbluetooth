@@ -1,8 +1,15 @@
-# Check for dependencies...
 # Statically link it in Windows targets
 libs_static = target_machine.system() == 'windows' or target_machine.system() == 'cygwin'
+
+# Check for dependencies...
 libusb_dep = dependency('libusb-1.0', static : libs_static)
+if libusb_dep.found()
+  add_project_arguments('-DHAVE_LIBUSB', language : 'c')
+endif
 libserialport_dep = dependency('libserialport', static : libs_static, required : false)
+if libserialport_dep.found()
+  add_project_arguments('-DHAVE_LIBSERIALPORT', language : 'c')
+endif
 
 # Project library
 libusbbluetooth_inc = include_directories('.')
