@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 
-static int _count_bluetooth_devices(libusb_device **list, int *num);
+static int _libusb_count_bluetooth_devices(libusb_device **list, int *num);
 static usbbluetooth_device_t *_dev_from_libusb(libusb_device *dev);
 
 usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetooth_device_t ***list_ptr)
@@ -18,16 +18,16 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetoot
     if (list_ptr == NULL)
         return USBBLUETOOTH_STATUS_ERR_UNK;
 
-    // Get a list of all devices...
-    libusb_device **devs_internal;
-    int r = libusb_get_device_list(NULL, &devs_internal);
+    // Get a list of USB devices...
+    libusb_device **devs_internal_usb;
+    int r = libusb_get_device_list(NULL, &devs_internal_usb);
     usbbluetooth_log_debug("libusb_get_device_list[r=%d]", r);
     if (r < LIBUSB_SUCCESS)
         return USBBLUETOOTH_STATUS_ERR_UNK;
 
-    // Count the number of bluetooth devices...
+    // Count the number of USB Bluetooth devices...
     int num_devs = 0;
-    r = _count_bluetooth_devices(devs_internal, &num_devs);
+    r = _libusb_count_bluetooth_devices(devs_internal_usb, &num_devs);
     usbbluetooth_log_debug("_count_bluetooth_devices[r=%d, n=%d]", r, num_devs);
     if (r < LIBUSB_SUCCESS)
         return USBBLUETOOTH_STATUS_ERR_UNK;
@@ -45,7 +45,7 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetoot
 
     // Iterate again...
     libusb_device *dev;
-    for (int i = 0, pos = 0; (dev = devs_internal[i]) != NULL; i++)
+    for (int i = 0, pos = 0; (dev = devs_internal_usb[i]) != NULL; i++)
     {
         bool is_bt = false;
         if (_is_bluetooth_device(dev, &is_bt) == LIBUSB_SUCCESS && is_bt)
@@ -55,12 +55,12 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetoot
     }
 
     // Cleanup
-    libusb_free_device_list(devs_internal, 1);
+    libusb_free_device_list(devs_internal_usb, 1);
 
     return USBBLUETOOTH_STATUS_OK;
 }
 
-static int _count_bluetooth_devices(libusb_device **list, int *num)
+static int _libusb_count_bluetooth_devices(libusb_device **list, int *num)
 {
     // Reset the counter...
     *num = 0;
