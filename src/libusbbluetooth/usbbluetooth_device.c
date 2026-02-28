@@ -2,7 +2,7 @@
 
 #include "usbbluetooth_log.h"
 #include "device.h"
-#include "utils.h"
+#include "utils_libusb.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -48,7 +48,7 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetoot
     for (int i = 0, pos = 0; (dev = devs_internal_usb[i]) != NULL; i++)
     {
         bool is_bt = false;
-        if (_is_bluetooth_device(dev, &is_bt) == LIBUSB_SUCCESS && is_bt)
+        if (_libusb_is_bluetooth_device(dev, &is_bt) == LIBUSB_SUCCESS && is_bt)
         {
             list[pos++] = usbbluetooth_reference_device(_dev_from_libusb(dev));
         }
@@ -71,7 +71,7 @@ static int _libusb_count_bluetooth_devices(libusb_device **list, int *num)
     {
         // Check if device has a Bluetooth interface...
         bool is_bt = false;
-        int r = _is_bluetooth_device(dev, &is_bt);
+        int r = _libusb_is_bluetooth_device(dev, &is_bt);
         if (r == LIBUSB_ERROR_NOT_FOUND)
             is_bt = false;
         else if (r < LIBUSB_SUCCESS)

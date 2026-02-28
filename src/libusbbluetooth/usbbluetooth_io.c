@@ -3,7 +3,7 @@
 #include "usbbluetooth_log.h"
 
 #include "device.h"
-#include "utils.h"
+#include "utils_libusb.h"
 #include "hci.h"
 
 #define TIMEOUT 1000
@@ -23,7 +23,7 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_open(usbbluetooth_device_t 
         return USBBLUETOOTH_STATUS_ERR_UNK;
     }
 
-    err = _dev_find_bluetooth_interface(usb, &ctx->interface_num);
+    err = _libusb_dev_find_bluetooth_interface(usb, &ctx->interface_num);
     if (err < LIBUSB_SUCCESS)
         return USBBLUETOOTH_STATUS_ERR_UNK;
 
@@ -35,15 +35,15 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_open(usbbluetooth_device_t 
     if (err < LIBUSB_SUCCESS)
         return USBBLUETOOTH_STATUS_ERR_UNK;
 
-    err = _dev_find_evt_ep(usb, &ctx->epnum_evt);
+    err = _libusb_dev_find_evt_ep(usb, &ctx->epnum_evt);
     if (err < LIBUSB_SUCCESS)
         return USBBLUETOOTH_STATUS_ERR_UNK;
 
-    err = _dev_find_acl_in_ep(usb, &ctx->epnum_acl_in);
+    err = _libusb_dev_find_acl_in_ep(usb, &ctx->epnum_acl_in);
     if (err < LIBUSB_SUCCESS)
         return USBBLUETOOTH_STATUS_ERR_UNK;
 
-    err = _dev_find_acl_out_ep(usb, &ctx->epnum_acl_out);
+    err = _libusb_dev_find_acl_out_ep(usb, &ctx->epnum_acl_out);
     if (err < LIBUSB_SUCCESS)
         return USBBLUETOOTH_STATUS_ERR_UNK;
 
