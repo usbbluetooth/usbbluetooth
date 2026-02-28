@@ -19,9 +19,13 @@ libusbbluetooth_src = files([
   'usbbluetooth_device.c',
   'usbbluetooth_io.c',
   'usbbluetooth_log.c',
-  'utils_libusb.c',
-  'utils_ser.c',
 ])
+if libusb_dep.found()
+  libusbbluetooth_src += files('utils_libusb.c')
+endif
+if libserialport_dep.found()
+  libusbbluetooth_src += files('utils_ser.c')
+endif
 libusbbluetooth_pub_headers = files([
   'usbbluetooth.h',
   'usbbluetooth_err.h',
