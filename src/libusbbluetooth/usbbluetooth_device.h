@@ -3,7 +3,6 @@
 
 #include "usbbluetooth_api.h"
 #include "usbbluetooth_err.h"
-#include <libusb.h>
 #include <stdint.h>
 
 /**
@@ -15,19 +14,6 @@ typedef enum
     USBBLUETOOTH_DEVICE_TYPE_SERIAL = 1
 } usbbluetooth_device_type_t;
 
-
-/**
- * USB device context structure.
- */
-typedef struct
-{
-    libusb_device_handle *handle;
-    uint8_t interface_num;
-    uint8_t epnum_evt;
-    uint8_t epnum_acl_in;
-    uint8_t epnum_acl_out;
-} usbbluetooth_device_ctx_usb_t;
-
 /**
  * USB Bluetooth device struct.
  */
@@ -35,14 +21,8 @@ typedef struct
 {
     uint8_t ref_count;
     usbbluetooth_device_type_t type;
-    union
-    {
-        libusb_device *usb;
-    } device;
-    union
-    {
-        usbbluetooth_device_ctx_usb_t *usb;
-    } context;
+    void *device;
+    void *context;
 } usbbluetooth_device_t;
 
 /**
