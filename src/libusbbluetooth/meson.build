@@ -13,6 +13,7 @@ libusbbluetooth_src = files([
   'usbbluetooth_io.c',
   'usbbluetooth_log.c',
   'utils_libusb.c',
+  'utils_ser.c',
 ])
 libusbbluetooth_pub_headers = files([
   'usbbluetooth.h',
