@@ -52,7 +52,7 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetoot
     {
         bool is_bt = false;
         if (_libusb_is_bluetooth_device(dev, &is_bt) == LIBUSB_SUCCESS && is_bt)
-            list[pos++] = usbbluetooth_reference_device(_dev_from_libusb(dev));
+            list[pos++] = usbbluetooth_reference_device(_libusb_create_dev(dev));
     }
 
     // Cleanup...
@@ -96,12 +96,16 @@ void USBBLUETOOTH_CALL usbbluetooth_unreference_device(usbbluetooth_device_t **d
     dev->ref_count--;
 
     if (dev->ref_count == 0)
-    {
-        libusb_unref_device(dev->device);
-        free(dev->context);
-        free(dev);
-        *dev_ptr = NULL;
-    }
+        switch (dev->type)
+        {
+#if defined(HAVE_LIBUSB)
+        case USBBLUETOOTH_DEVICE_TYPE_USB:
+            _libusb_free_dev(dev_ptr);
+            break;
+#endif
+        default:
+            break;
+        }
 }
 
 void USBBLUETOOTH_CALL usbbluetooth_device_vid_pid(usbbluetooth_device_t *dev, uint16_t *vid, uint16_t *pid)

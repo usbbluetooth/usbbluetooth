@@ -23,7 +23,7 @@ int _libusb_count_bluetooth_devices(libusb_device **list, int *num)
     return LIBUSB_SUCCESS;
 }
 
-usbbluetooth_device_t *_dev_from_libusb(libusb_device *dev)
+usbbluetooth_device_t *_libusb_create_dev(libusb_device *dev)
 {
     usbbluetooth_device_t *btdev = calloc(1, sizeof(usbbluetooth_device_t));
     btdev->ref_count = 0;
@@ -33,4 +33,13 @@ usbbluetooth_device_t *_dev_from_libusb(libusb_device *dev)
     memset(ctx, 0, sizeof(_device_ctx_usb_t));
     btdev->context = ctx;
     return btdev;
+}
+
+void _libusb_free_dev(usbbluetooth_device_t **dev_ptr)
+{
+    usbbluetooth_device_t *dev = *dev_ptr;
+    libusb_unref_device(dev->device);
+    free(dev->context);
+    free(dev);
+    *dev_ptr = NULL;
 }

@@ -17,6 +17,7 @@ typedef struct
 } _device_ctx_usb_t;
 
 int _libusb_count_bluetooth_devices(libusb_device **list, int *num);
-usbbluetooth_device_t *_dev_from_libusb(libusb_device *dev);
+usbbluetooth_device_t *_libusb_create_dev(libusb_device *dev);
+void _libusb_free_dev(usbbluetooth_device_t **dev_ptr);
 
 #endif
