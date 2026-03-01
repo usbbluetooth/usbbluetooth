@@ -44,6 +44,9 @@ Your Linux user must have permissions to access USB hardware. Here are several o
   ```
   Replace `your_vendor_id` and `your_product_id` with the actual vendor and product IDs of your device (you can find these using `lsusb`). Then reload udev rules with `sudo udevadm control --reload-rules && sudo udevadm trigger`.
 
+### MacOs
+In MacOs you may have to install `fmt` and `libusb`. For more information about troubleshooting read the [usage document](Usage.md) for more information.
+
 ## Contributors
 
 Special thanks to [Tarlogic Security](https://github.com/TarlogicSecurity/) for sponsoring part of the development of this project via paid work hours.
