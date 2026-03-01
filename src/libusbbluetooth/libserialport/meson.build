@@ -2,5 +2,6 @@
 add_project_arguments('-DHAVE_LIBSERIALPORT', language : 'c')
 
 libusbbluetooth_src += files([
+  'device.c',
   'utils.c',
 ])

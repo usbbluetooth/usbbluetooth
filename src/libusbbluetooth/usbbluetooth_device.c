@@ -5,6 +5,10 @@
 #include "libusb/device.h"
 #include "libusb/utils.h"
 #endif
+#if defined(HAVE_LIBSERIALPORT)
+#include "libserialport/device.h"
+#include "libserialport/utils.h"
+#endif
 #include <stdlib.h>
 
 usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetooth_device_t ***list_ptr)
@@ -32,6 +36,20 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetoot
         return USBBLUETOOTH_STATUS_ERR_UNK;
 #endif
 
+#if defined(HAVE_LIBSERIALPORT)
+    // Get a list of Serial devices...
+    struct sp_port **devs_internal_ser;
+    enum sp_return r_sp = sp_list_ports(&devs_internal_ser);
+    if (r_sp != SP_OK)
+        return USBBLUETOOTH_STATUS_ERR_UNK;
+
+    // Count the number of serial Bluetooth devices...
+    r = _serial_count_bluetooth_devices(devs_internal_ser, &num_devs);
+    usbbluetooth_log_debug("_count_serial_bluetooth_devices[r=%d, n=%d]", r, num_devs);
+    if (r < SP_OK)
+        return USBBLUETOOTH_STATUS_ERR_UNK;
+#endif
+
     // Create a new list!
     *list_ptr = calloc((size_t)num_devs + 1, sizeof(struct usbbluetooth_device_t *));
     if (*list_ptr == NULL)
@@ -55,6 +73,20 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetoot
 
     // Cleanup...
     libusb_free_device_list(devs_internal_usb, 1);
+#endif
+
+#if defined(HAVE_LIBSERIALPORT)
+    // Now copy devices to the list...
+    struct sp_port *dev_ser;
+    for (int i = 0, pos = 0; (dev_ser = devs_internal_ser[i]) != NULL; i++)
+    {
+        bool is_bt = false;
+        if (_serial_is_bluetooth_device(dev_ser, &is_bt) == SP_OK && is_bt)
+            list[pos++] = usbbluetooth_reference_device(_serial_create_dev(dev_ser));
+    }
+
+    // Cleanup
+    sp_free_port_list(devs_internal_ser);
 #endif
 
     return USBBLUETOOTH_STATUS_OK;
@@ -101,6 +133,11 @@ void USBBLUETOOTH_CALL usbbluetooth_unreference_device(usbbluetooth_device_t **d
             _libusb_free_dev(dev_ptr);
             break;
 #endif
+#if defined(HAVE_LIBSERIALPORT)
+        case USBBLUETOOTH_DEVICE_TYPE_SERIAL:
+            _serial_free_dev(dev_ptr);
+            break;
+#endif
         default:
             break;
         }
@@ -113,6 +150,11 @@ void USBBLUETOOTH_CALL usbbluetooth_device_vid_pid(usbbluetooth_device_t *dev, u
 #if defined(HAVE_LIBUSB)
     case USBBLUETOOTH_DEVICE_TYPE_USB:
         _libusb_vid_pid(dev, vid, pid);
+        break;
+#endif
+#if defined(HAVE_LIBSERIALPORT)
+    case USBBLUETOOTH_DEVICE_TYPE_SERIAL:
+        _serial_vid_pid(dev, vid, pid);
         break;
 #endif
     default:
@@ -128,6 +170,10 @@ char *USBBLUETOOTH_CALL usbbluetooth_device_manufacturer(usbbluetooth_device_t *
     case USBBLUETOOTH_DEVICE_TYPE_USB:
         return _libusb_device_manufacturer(dev);
 #endif
+#if defined(HAVE_LIBSERIALPORT)
+    case USBBLUETOOTH_DEVICE_TYPE_SERIAL:
+        return _serial_device_manufacturer(dev);
+#endif
     default:
         return NULL;
     }
@@ -140,6 +186,10 @@ char *USBBLUETOOTH_CALL usbbluetooth_device_product(usbbluetooth_device_t *dev)
 #if defined(HAVE_LIBUSB)
     case USBBLUETOOTH_DEVICE_TYPE_USB:
         return _libusb_device_product(dev);
+#endif
+#if defined(HAVE_LIBSERIALPORT)
+    case USBBLUETOOTH_DEVICE_TYPE_SERIAL:
+        return _serial_device_product(dev);
 #endif
     default:
         return NULL;
@@ -154,6 +204,10 @@ char *USBBLUETOOTH_CALL usbbluetooth_device_serial_num(usbbluetooth_device_t *de
     case USBBLUETOOTH_DEVICE_TYPE_USB:
         return _libusb_device_serial_num(dev);
 #endif
+#if defined(HAVE_LIBSERIALPORT)
+    case USBBLUETOOTH_DEVICE_TYPE_SERIAL:
+        return _serial_device_serial_num(dev);
+#endif
     default:
         return NULL;
     }
@@ -166,6 +220,10 @@ char *USBBLUETOOTH_CALL usbbluetooth_device_description(usbbluetooth_device_t *d
 #if defined(HAVE_LIBUSB)
     case USBBLUETOOTH_DEVICE_TYPE_USB:
         return _libusb_device_description(dev);
+#endif
+#if defined(HAVE_LIBSERIALPORT)
+    case USBBLUETOOTH_DEVICE_TYPE_SERIAL:
+        return _serial_device_description(dev);
 #endif
     default:
         return NULL;
