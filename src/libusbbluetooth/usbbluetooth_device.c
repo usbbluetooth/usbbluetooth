@@ -6,8 +6,6 @@
 #include "libusb/utils.h"
 #endif
 #include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 
 usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetooth_device_t ***list_ptr)
 {
@@ -110,89 +108,66 @@ void USBBLUETOOTH_CALL usbbluetooth_unreference_device(usbbluetooth_device_t **d
 
 void USBBLUETOOTH_CALL usbbluetooth_device_vid_pid(usbbluetooth_device_t *dev, uint16_t *vid, uint16_t *pid)
 {
-    libusb_device *usb = (libusb_device *)dev->device;
-    struct libusb_device_descriptor desc;
-    libusb_get_device_descriptor(usb, &desc);
-    *vid = desc.idVendor;
-    *pid = desc.idProduct;
-}
-
-char *_usb_get_descriptor_ascii(libusb_device_handle *dev_handle, uint8_t desc_num)
-{
-    if (dev_handle == NULL)
-        return NULL;
-    char tmp[256];
-    int r = libusb_get_string_descriptor_ascii(dev_handle, desc_num, (uint8_t *)tmp, sizeof(tmp));
-    if (r < LIBUSB_SUCCESS)
-        return NULL;
-    tmp[r] = 0;
-    return strdup(tmp);
+    switch (dev->type)
+    {
+#if defined(HAVE_LIBUSB)
+    case USBBLUETOOTH_DEVICE_TYPE_USB:
+        _libusb_vid_pid(dev, vid, pid);
+        break;
+#endif
+    default:
+        break;
+    }
 }
 
 char *USBBLUETOOTH_CALL usbbluetooth_device_manufacturer(usbbluetooth_device_t *dev)
 {
-    libusb_device *usb = (libusb_device *)dev->device;
-    _device_ctx_usb_t *ctx = (_device_ctx_usb_t *)dev->context;
-    struct libusb_device_descriptor desc;
-    libusb_get_device_descriptor(usb, &desc);
-    if (desc.iManufacturer == 0)
+    switch (dev->type)
+    {
+#if defined(HAVE_LIBUSB)
+    case USBBLUETOOTH_DEVICE_TYPE_USB:
+        return _libusb_device_manufacturer(dev);
+#endif
+    default:
         return NULL;
-    return _usb_get_descriptor_ascii(ctx->handle, desc.iManufacturer);
+    }
 }
 
 char *USBBLUETOOTH_CALL usbbluetooth_device_product(usbbluetooth_device_t *dev)
 {
-    libusb_device *usb = (libusb_device *)dev->device;
-    _device_ctx_usb_t *ctx = (_device_ctx_usb_t *)dev->context;
-    struct libusb_device_descriptor desc;
-    libusb_get_device_descriptor(usb, &desc);
-    if (desc.iProduct == 0)
+    switch (dev->type)
+    {
+#if defined(HAVE_LIBUSB)
+    case USBBLUETOOTH_DEVICE_TYPE_USB:
+        return _libusb_device_product(dev);
+#endif
+    default:
         return NULL;
-    return _usb_get_descriptor_ascii(ctx->handle, desc.iProduct);
+    }
 }
 
 char *USBBLUETOOTH_CALL usbbluetooth_device_serial_num(usbbluetooth_device_t *dev)
 {
-    libusb_device *usb = (libusb_device *)dev->device;
-    _device_ctx_usb_t *ctx = (_device_ctx_usb_t *)dev->context;
-    struct libusb_device_descriptor desc;
-    libusb_get_device_descriptor(usb, &desc);
-    if (desc.iSerialNumber == 0)
+    switch (dev->type)
+    {
+#if defined(HAVE_LIBUSB)
+    case USBBLUETOOTH_DEVICE_TYPE_USB:
+        return _libusb_device_serial_num(dev);
+#endif
+    default:
         return NULL;
-    return _usb_get_descriptor_ascii(ctx->handle, desc.iSerialNumber);
+    }
 }
-
-#define MAX_LEN 256
 
 char *USBBLUETOOTH_CALL usbbluetooth_device_description(usbbluetooth_device_t *dev)
 {
-    libusb_device *usb = (libusb_device *)dev->device;
-    _device_ctx_usb_t *ctx = (_device_ctx_usb_t *)dev->context;
-    // Get USB descriptor
-    struct libusb_device_descriptor desc;
-    libusb_get_device_descriptor(usb, &desc);
-    // Create a tmp string with VID and PID
-    uint16_t len_rem = MAX_LEN;
-    char tmp[MAX_LEN];
-    len_rem -= snprintf(tmp, len_rem, "VID=0x%04x PID=0x%04x", desc.idVendor, desc.idProduct);
-    // Add accesory info if available
-    char *manuf = _usb_get_descriptor_ascii(ctx->handle, desc.iManufacturer);
-    if (manuf)
+    switch (dev->type)
     {
-        len_rem -= snprintf(tmp + strlen(tmp), len_rem, " %s", manuf);
-        free(manuf);
+#if defined(HAVE_LIBUSB)
+    case USBBLUETOOTH_DEVICE_TYPE_USB:
+        return _libusb_device_description(dev);
+#endif
+    default:
+        return NULL;
     }
-    char *prod = _usb_get_descriptor_ascii(ctx->handle, desc.iProduct);
-    if (prod)
-    {
-        len_rem -= snprintf(tmp + strlen(tmp), len_rem, " %s", prod);
-        free(prod);
-    }
-    char *sernum = _usb_get_descriptor_ascii(ctx->handle, desc.iSerialNumber);
-    if (sernum)
-    {
-        len_rem -= snprintf(tmp + strlen(tmp), len_rem, " %s", sernum);
-        free(sernum);
-    }
-    return strdup(tmp);
 }
