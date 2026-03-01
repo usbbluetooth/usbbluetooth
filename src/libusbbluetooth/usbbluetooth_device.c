@@ -61,10 +61,11 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetoot
     // Get the list
     usbbluetooth_device_t **list = *list_ptr;
 
+    int pos = 0;
 #if defined(HAVE_LIBUSB)
     // Now copy devices to the list...
     libusb_device *dev;
-    for (int i = 0, pos = 0; (dev = devs_internal_usb[i]) != NULL; i++)
+    for (int i = 0; (dev = devs_internal_usb[i]) != NULL; i++)
     {
         bool is_bt = false;
         if (_libusb_is_bluetooth_device(dev, &is_bt) == LIBUSB_SUCCESS && is_bt)
@@ -78,7 +79,7 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetoot
 #if defined(HAVE_LIBSERIALPORT)
     // Now copy devices to the list...
     struct sp_port *dev_ser;
-    for (int i = 0, pos = 0; (dev_ser = devs_internal_ser[i]) != NULL; i++)
+    for (int i = 0; (dev_ser = devs_internal_ser[i]) != NULL; i++)
     {
         bool is_bt = false;
         if (_serial_is_bluetooth_device(dev_ser, &is_bt) == SP_OK && is_bt)
