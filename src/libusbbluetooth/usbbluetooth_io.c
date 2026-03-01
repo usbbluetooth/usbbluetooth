@@ -2,8 +2,10 @@
 
 #include "usbbluetooth_log.h"
 
-#include "device.h"
-#include "utils_libusb.h"
+#if HAVE_LIBUSB
+#include "libusb/device.h"
+#include "libusb/utils.h"
+#endif
 #include "hci.h"
 
 #define TIMEOUT 1000

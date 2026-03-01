@@ -3,13 +3,7 @@ libs_static = target_machine.system() == 'windows' or target_machine.system() ==
 
 # Check for dependencies...
 libusb_dep = dependency('libusb-1.0', static : libs_static)
-if libusb_dep.found()
-  add_project_arguments('-DHAVE_LIBUSB', language : 'c')
-endif
 libserialport_dep = dependency('libserialport', static : libs_static, required : false)
-if libserialport_dep.found()
-  add_project_arguments('-DHAVE_LIBSERIALPORT', language : 'c')
-endif
 
 # Project library
 libusbbluetooth_inc = include_directories('.')
@@ -21,10 +15,10 @@ libusbbluetooth_src = files([
   'usbbluetooth_log.c',
 ])
 if libusb_dep.found()
-  libusbbluetooth_src += files('utils_libusb.c')
+  subdir('libusb')
 endif
 if libserialport_dep.found()
-  libusbbluetooth_src += files('utils_ser.c')
+  subdir('libserialport')
 endif
 libusbbluetooth_pub_headers = files([
   'usbbluetooth.h',

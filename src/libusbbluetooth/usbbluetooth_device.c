@@ -1,14 +1,13 @@
 #include <usbbluetooth_device.h>
 
 #include "usbbluetooth_log.h"
-#include "device.h"
-#include "utils_libusb.h"
+#if defined(HAVE_LIBUSB)
+#include "libusb/device.h"
+#include "libusb/utils.h"
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
-static int _libusb_count_bluetooth_devices(libusb_device **list, int *num);
-static usbbluetooth_device_t *_dev_from_libusb(libusb_device *dev);
 
 usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetooth_device_t ***list_ptr)
 {
@@ -18,6 +17,9 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetoot
     if (list_ptr == NULL)
         return USBBLUETOOTH_STATUS_ERR_UNK;
 
+    int num_devs = 0;
+
+#if defined(HAVE_LIBUSB)
     // Get a list of USB devices...
     libusb_device **devs_internal_usb;
     int r = libusb_get_device_list(NULL, &devs_internal_usb);
@@ -26,11 +28,11 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetoot
         return USBBLUETOOTH_STATUS_ERR_UNK;
 
     // Count the number of USB Bluetooth devices...
-    int num_devs = 0;
     r = _libusb_count_bluetooth_devices(devs_internal_usb, &num_devs);
     usbbluetooth_log_debug("_count_bluetooth_devices[r=%d, n=%d]", r, num_devs);
     if (r < LIBUSB_SUCCESS)
         return USBBLUETOOTH_STATUS_ERR_UNK;
+#endif
 
     // Create a new list!
     *list_ptr = calloc((size_t)num_devs + 1, sizeof(struct usbbluetooth_device_t *));
@@ -43,56 +45,21 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_get_device_list(usbbluetoot
     // Get the list
     usbbluetooth_device_t **list = *list_ptr;
 
-    // Iterate again...
+#if defined(HAVE_LIBUSB)
+    // Now copy devices to the list...
     libusb_device *dev;
     for (int i = 0, pos = 0; (dev = devs_internal_usb[i]) != NULL; i++)
     {
         bool is_bt = false;
         if (_libusb_is_bluetooth_device(dev, &is_bt) == LIBUSB_SUCCESS && is_bt)
-        {
             list[pos++] = usbbluetooth_reference_device(_dev_from_libusb(dev));
-        }
     }
 
-    // Cleanup
+    // Cleanup...
     libusb_free_device_list(devs_internal_usb, 1);
+#endif
 
     return USBBLUETOOTH_STATUS_OK;
-}
-
-static int _libusb_count_bluetooth_devices(libusb_device **list, int *num)
-{
-    // Reset the counter...
-    *num = 0;
-
-    // Iterate all devices...
-    libusb_device *dev;
-    for (int i = 0; (dev = list[i]) != NULL; i++)
-    {
-        // Check if device has a Bluetooth interface...
-        bool is_bt = false;
-        int r = _libusb_is_bluetooth_device(dev, &is_bt);
-        if (r == LIBUSB_ERROR_NOT_FOUND)
-            is_bt = false;
-        else if (r < LIBUSB_SUCCESS)
-            return r;
-        if (is_bt)
-            (*num)++;
-    }
-    return LIBUSB_SUCCESS;
-}
-
-static usbbluetooth_device_t *_dev_from_libusb(libusb_device *dev)
-{
-    usbbluetooth_log_debug("_dev_from_libusb[dev=%p]", dev);
-    usbbluetooth_device_t *btdev = calloc(1, sizeof(usbbluetooth_device_t));
-    btdev->ref_count = 0;
-    btdev->type = USBBLUETOOTH_DEVICE_TYPE_USB;
-    btdev->device = libusb_ref_device(dev);
-    _device_ctx_usb_t *ctx = calloc(1, sizeof(_device_ctx_usb_t));
-    memset(ctx, 0, sizeof(_device_ctx_usb_t));
-    btdev->context = ctx;
-    return btdev;
 }
 
 void USBBLUETOOTH_CALL usbbluetooth_free_device_list(usbbluetooth_device_t ***list)
