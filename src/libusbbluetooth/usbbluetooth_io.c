@@ -5,6 +5,9 @@
 #if HAVE_LIBUSB
 #include "libusb/io.h"
 #endif
+#if defined(HAVE_LIBSERIALPORT)
+#include "libserialport/io.h"
+#endif
 
 usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_open(usbbluetooth_device_t *dev)
 {
@@ -13,6 +16,10 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_open(usbbluetooth_device_t 
 #if defined(HAVE_LIBUSB)
     case USBBLUETOOTH_DEVICE_TYPE_USB:
         return _libusb_open(dev);
+#endif
+#if defined(HAVE_LIBSERIALPORT)
+    case USBBLUETOOTH_DEVICE_TYPE_SERIAL:
+        return _serial_open(dev);
 #endif
     default:
         return USBBLUETOOTH_STATUS_ERR_UNK;
@@ -28,6 +35,11 @@ void USBBLUETOOTH_CALL usbbluetooth_close(usbbluetooth_device_t *dev)
         _libusb_close(dev);
         break;
 #endif
+#if defined(HAVE_LIBSERIALPORT)
+    case USBBLUETOOTH_DEVICE_TYPE_SERIAL:
+        _serial_close(dev);
+        break;
+#endif
     default:
         break;
     }
@@ -41,6 +53,10 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_write(usbbluetooth_device_t
     case USBBLUETOOTH_DEVICE_TYPE_USB:
         return _libusb_write(dev, data, size);
 #endif
+#if defined(HAVE_LIBSERIALPORT)
+    case USBBLUETOOTH_DEVICE_TYPE_SERIAL:
+        return _serial_write(dev, data, size);
+#endif
     default:
         return USBBLUETOOTH_STATUS_ERR_UNK;
     }
@@ -53,6 +69,10 @@ usbbluetooth_status_t USBBLUETOOTH_CALL usbbluetooth_read(usbbluetooth_device_t 
 #if defined(HAVE_LIBUSB)
     case USBBLUETOOTH_DEVICE_TYPE_USB:
         return _libusb_read(dev, data, size);
+#endif
+#if defined(HAVE_LIBSERIALPORT)
+    case USBBLUETOOTH_DEVICE_TYPE_SERIAL:
+        return _serial_read(dev, data, size);
 #endif
     default:
         return USBBLUETOOTH_STATUS_ERR_UNK;
