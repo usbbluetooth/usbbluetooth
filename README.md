@@ -2,6 +2,7 @@
 
 [![Build](https://github.com/usbbluetooth/usbbluetooth/actions/workflows/build.yml/badge.svg)](https://github.com/usbbluetooth/usbbluetooth/actions/workflows/build.yml)
 [![CodeQL](https://github.com/usbbluetooth/usbbluetooth/actions/workflows/codeql.yml/badge.svg)](https://github.com/usbbluetooth/usbbluetooth/actions/workflows/codeql.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/usbbluetooth/usbbluetooth/badge)](https://scorecard.dev/viewer/?uri=github.com/usbbluetooth/usbbluetooth)
 
 LibUSB based Bluetooth device driver. Take full control of your USB Bluetooth devices using C!
 
