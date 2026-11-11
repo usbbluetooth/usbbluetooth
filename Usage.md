@@ -11,12 +11,38 @@ You must also link against the library or use a shared library version. For this
 The library is distributed y binary format available in https://github.com/antoniovazquezblanco/usbbluetooth/releases.
 The library may also be available for installation via your favourite package manager.
 
+### Macos
+If you will use `brew` as your package manager you need to install first `fmt` and `libusb`.
+
+```bash
+brew install fmt libusb
+meson setup build --wipe --wrap-mode=forcefallback
+cd build
+sudo meson install
+```
+
+The command `meson setup build --wipe --wrap-mode=forcefallback` is to ensure non-cached packages.
+
+In case an error with the `ccache` and versions, run the `brew reinstall ccache`.
+```bash
+# Example error
+[1/5] Compiling C object src/usbbt/usbbt.p/main.c.o
+FAILED: [code=134] src/usbbt/usbbt.p/main.c.o 
+ccache cc -Isrc/usbbt/usbbt.p -Isrc/usbbt -I../src/usbbt -Isrc/libusbbluetooth -I../src/libusbbluetooth -I../subprojects/cwalk-1.2.9/include -I/opt/homebrew/Cellar/libusb/1.0.29/include/libusb-1.0 -fdiagnostics-color=always -Wall -Winvalid-pch -O0 -g -MD -MQ src/usbbt/usbbt.p/main.c.o -MF src/usbbt/usbbt.p/main.c.o.d -o src/usbbt/usbbt.p/main.c.o -c ../src/usbbt/main.c
+dyld[32146]: Library not loaded: /opt/homebrew/opt/fmt/lib/libfmt.11.dylib
+  Referenced from: <3FE95377-F54E-353D-9397-74E23EA42650> /opt/homebrew/Cellar/ccache/4.11.3_1/bin/ccache
+  Reason: tried: '/opt/homebrew/opt/fmt/lib/libfmt.11.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/opt/fmt/lib/libfmt.11.dylib' (no such file), '/opt/homebrew/opt/fmt/lib/libfmt.11.dylib' (no such file), '/opt/homebrew/Cellar/fmt/12.1.0/lib/libfmt.11.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/Cellar/fmt/12.1.0/lib/libfmt.11.dylib' (no such file), '/opt/homebrew/Cellar/fmt/12.1.0/lib/libfmt.11.dylib' (no such file)
+[3/5] Linking target src/libusbbluetooth/libusbbluetooth.dylib
+ninja: build stopped: subcommand failed.  
+```
+
 You can also choose to compile it for you platform.
 To compile the project just follow the common steps to compile using meson.
 
 ```bash
 meson setup build
 meson compile -C build
+cd build
 sudo meson install
 ```
 
